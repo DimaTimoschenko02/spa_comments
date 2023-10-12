@@ -1,0 +1,48 @@
+version: '3.8'
+
+volumes:
+  pgdata:
+  cache-data:
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:14.7
+    restart: on-failure
+    env_file:
+      - '.env'
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    environment:
+      PG_DATA: /var/lib/postgresql/data
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  redis:
+    image: redis:6
+    container_name: redis
+    restart: on-failure
+    env_file:
+      - '.env'
+    volumes:
+      - cache-data:/data
+    ports:
+      - '${REDIS_CACHE_PORT}:${REDIS_CACHE_PORT}'
+    expose:
+      - '${REDIS_CACHE_PORT}'
+    command: '--port ${REDIS_CACHE_PORT}'
+  app:
+    container_name: app
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: docker/${NODE_ENV}/Dockerfile
+    env_file:
+      - '.env'
+    volumes:
+      - /base/node_modules/
+      - ./:/base
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+    depends_on:
+      - postgres
+      - redis
