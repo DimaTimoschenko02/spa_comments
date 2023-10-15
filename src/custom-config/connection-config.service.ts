@@ -3,6 +3,8 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 import { CustomConfigService } from './custom-config.service';
 import * as DbMigrationsModule from './migrations';
+import { User } from '@src/user/entities/user.entity';
+import { Profile } from '@src/profile/entities/profile.entity';
 
 const dbMigrations = Object.values(DbMigrationsModule);
 
@@ -18,7 +20,7 @@ export class ConnectionConfigService {
     this.postgresConnectionOptions = {
       type: 'postgres',
       url: this.configService.get<string>('POSTGRES_URL'),
-      entities: [],
+      entities: [User, Profile],
       migrations: dbMigrations,
       migrationsRun: true,
       migrationsTableName: 'migrations',
