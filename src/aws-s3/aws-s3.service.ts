@@ -50,7 +50,7 @@ export class AwsS3Service {
     }
   }
 
-  private async upload(
+  public async upload(
     file: Buffer,
     type: string,
     path: string,

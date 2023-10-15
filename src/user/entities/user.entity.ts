@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { IdTimestampEntity } from '@src/common/entities/id-timestamp.entity';
 import { Profile } from '@src/profile/entities/profile.entity';
+import { Comment } from '@src/comment/entities/comment.entity';
 
 @Entity('spa_user')
 export class User extends IdTimestampEntity {
@@ -16,4 +17,7 @@ export class User extends IdTimestampEntity {
   @ManyToOne(() => Profile, (profile) => profile.user, { nullable: true })
   @JoinColumn({ name: 'profile_id', referencedColumnName: 'id' })
   profile: Profile;
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
 }
