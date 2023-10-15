@@ -5,6 +5,8 @@ import { CustomConfigModule } from '@src/custom-config/custom-config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConnectionConfigService } from '@src/custom-config/connection-config.service';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from '@src/auth/auth.module';
+import { UserModule } from '@src/user/user.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { ConfigModule } from '@nestjs/config';
         configService.getDbConnectionOption(),
     }),
     ConfigModule,
+    AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -12,6 +12,17 @@ export class CreateComment1697112175092 implements MigrationInterface {
     { name: 'id', type: 'int8', isPrimary: true, isGenerated: true },
     { name: 'text', type: 'text' },
     { name: 'user_id', type: 'int8', isUnique: true },
+    { name: 'home_page', type: 'varchar', length: '256', isNullable: true },
+    {
+      name: 'created_at',
+      type: 'timestamp',
+      default: 'NOW()',
+    },
+    {
+      name: 'updated_at',
+      type: 'timestamp',
+      default: 'NOW()',
+    },
   ];
   private readonly foreignKeys: Array<TableForeignKeyOptions> = [
     {

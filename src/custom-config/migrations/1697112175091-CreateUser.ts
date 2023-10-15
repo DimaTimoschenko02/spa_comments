@@ -17,8 +17,7 @@ export class CreateUser1697112175091 implements MigrationInterface {
     },
     {
       name: 'password',
-      type: 'varchar',
-      length: '32',
+      type: 'text',
     },
     {
       name: 'profile_id',
@@ -32,6 +31,16 @@ export class CreateUser1697112175091 implements MigrationInterface {
       isUnique: true,
     },
     { name: 'refreshToken', type: 'text', isNullable: true },
+    {
+      name: 'created_at',
+      type: 'timestamp',
+      default: 'NOW()',
+    },
+    {
+      name: 'updated_at',
+      type: 'timestamp',
+      default: 'NOW()',
+    },
   ];
   private readonly foreignKeys: Array<TableForeignKeyOptions> = [
     {

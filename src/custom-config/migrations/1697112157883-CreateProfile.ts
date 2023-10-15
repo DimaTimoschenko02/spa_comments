@@ -19,7 +19,16 @@ export class CreateProfile1697112157883 implements MigrationInterface {
       type: 'varchar',
       length: '64',
     },
-    { name: 'home_page', type: 'varchar', length: '256', isNullable: true },
+    {
+      name: 'created_at',
+      type: 'timestamp',
+      default: 'NOW()',
+    },
+    {
+      name: 'updated_at',
+      type: 'timestamp',
+      default: 'NOW()',
+    },
   ];
   private readonly table = new Table({
     name: this.tableName,
