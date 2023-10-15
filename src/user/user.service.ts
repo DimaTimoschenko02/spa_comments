@@ -41,7 +41,6 @@ export class UserService {
     userName,
     ...user
   }: CreateUserDto): Promise<{ message: string }> {
-    console.log({ user });
     const isExistsUser = await this.getUserByEmail(user.email);
 
     if (isExistsUser)

@@ -7,6 +7,7 @@ import { ConnectionConfigService } from '@src/custom-config/connection-config.se
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '@src/auth/auth.module';
 import { UserModule } from '@src/user/user.module';
+import { CommentModule } from '@src/comment/comment.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UserModule } from '@src/user/user.module';
     ConfigModule,
     AuthModule,
     UserModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
