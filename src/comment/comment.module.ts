@@ -5,12 +5,10 @@ import { CommentService } from '@src/comment/comment.service';
 import { Comment } from '@src/comment/entities/comment.entity';
 import { PublicFileModule } from '@src/public-file/public-file.module';
 import { CommentController } from '@src/comment/comment.controller';
-import { CommentFile } from '@src/comment/entities/comment-file.entity';
-import { CommentFileRepository } from '@src/comment/repositories/comment-file.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Comment, CommentFile]), PublicFileModule],
-  providers: [CommentRepository, CommentService, CommentFileRepository],
+  imports: [TypeOrmModule.forFeature([Comment]), PublicFileModule],
+  providers: [CommentRepository, CommentService],
   controllers: [CommentController],
 })
 export class CommentModule {}

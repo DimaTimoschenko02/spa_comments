@@ -32,9 +32,6 @@ export class AuthService {
   }: SignInDto): Promise<AccessRefreshTokensDto> {
     const existingUser = await this.userService.getUserByEmail(email);
 
-    if (isNil(existingUser))
-      throw new BadRequestException('IncorrectEmailOrPassword');
-
     return await this.validateAndGetTokens(existingUser, password);
   }
 

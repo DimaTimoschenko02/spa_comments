@@ -13,6 +13,7 @@ export class CreateComment1697112175092 implements MigrationInterface {
     { name: 'text', type: 'text' },
     { name: 'user_id', type: 'int8' },
     { name: 'home_page', type: 'varchar', length: '256', isNullable: true },
+    { name: 'is_main', type: 'boolean', default: true },
     {
       name: 'created_at',
       type: 'timestamp',

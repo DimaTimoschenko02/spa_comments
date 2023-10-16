@@ -18,6 +18,9 @@ export class Comment extends IdTimestampEntity {
   @Column({ type: 'varchar', length: '256', nullable: true, name: 'home_page' })
   homePage: string;
 
+  @Column({ type: 'boolean', name: 'is_main', default: true })
+  isMain: boolean;
+
   @ManyToOne(() => User, (user) => user.comments)
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;
@@ -33,9 +36,6 @@ export class Comment extends IdTimestampEntity {
   })
   childComments: Comment[];
 
-  // @OneToMany(() => CommentFile, (commentFile) => commentFile.comment)
-  // files: CommentFile[];
-
   @ManyToMany(() => PublicFile)
   @JoinTable({
     name: 'spa_comment_public_file',
@@ -43,4 +43,6 @@ export class Comment extends IdTimestampEntity {
     inverseJoinColumn: { name: 'public_file_id', referencedColumnName: 'id' },
   })
   files: PublicFile[];
+
+  childCommentsCount: number;
 }
