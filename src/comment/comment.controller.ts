@@ -8,7 +8,11 @@ import {
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
+  Put,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -21,15 +25,18 @@ import { PublicFile } from '@src/public-file/entities/public-file.entity';
 import { PublicFileDto } from '@src/public-file/dtos/public-file.dto';
 import { GetCurrentUserId } from '@src/common/decorators/get-current-user-id.decorator';
 import { CreateCommentBodyDto } from '@src/comment/dtos/create-comment-body.dto';
+import { UpdateCommentDto } from '@src/comment/dtos/update-comment.dto';
+import { IdDto } from '@src/common/dtos/id.dto';
+import { GetCommentsQueryDto } from '@src/comment/dtos/get-comments-query.dto';
 
 @ApiTags('Comment')
 @ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Post('file')
-  @ApiBearerAuth()
   @ApiOkResponse({ type: PublicFileDto })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -43,7 +50,6 @@ export class CommentController {
       },
     },
   })
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor('file', {
       fileFilter,
@@ -56,11 +62,24 @@ export class CommentController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
   public async createComment(
     @Body() createCommentDto: CreateCommentBodyDto,
     @GetCurrentUserId() userId: number,
   ): Promise<void> {
     return this.commentService.createComment(userId, createCommentDto);
+  }
+
+  @Put(':id')
+  public async updateComment(
+    @Body() comment: UpdateCommentDto,
+    @GetCurrentUserId() userId: number,
+    @Param() { id: commentId }: IdDto,
+  ): Promise<void> {
+    return this.commentService.updateComment(userId, commentId, comment);
+  }
+
+  @Get()
+  public async getComments(@Query() query: GetCommentsQueryDto) {
+    return this.commentService.getComments(query);
   }
 }

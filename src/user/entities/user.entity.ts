@@ -11,7 +11,7 @@ export class User extends IdTimestampEntity {
   @Column({ type: 'varchar', length: 64, unique: true })
   email: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, select: false })
   refreshToken: string;
 
   @ManyToOne(() => Profile, (profile) => profile.user, { nullable: true })

@@ -7,7 +7,6 @@ import { User } from '@src/user/entities/user.entity';
 import { Profile } from '@src/profile/entities/profile.entity';
 import { Comment } from '@src/comment/entities/comment.entity';
 import { PublicFile } from '@src/public-file/entities/public-file.entity';
-import { CommentFile } from '@src/comment/entities/comment-file.entity';
 
 const dbMigrations = Object.values(DbMigrationsModule);
 
@@ -23,7 +22,7 @@ export class ConnectionConfigService {
     this.postgresConnectionOptions = {
       type: 'postgres',
       url: this.configService.get<string>('POSTGRES_URL'),
-      entities: [User, Profile, Comment, PublicFile, CommentFile],
+      entities: [User, Profile, Comment, PublicFile],
       migrations: dbMigrations,
       migrationsRun: true,
       migrationsTableName: 'migrations',
