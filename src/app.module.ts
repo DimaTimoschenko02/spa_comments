@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '@src/auth/auth.module';
 import { UserModule } from '@src/user/user.module';
 import { CommentModule } from '@src/comment/comment.module';
+import { ProfileModule } from '@src/profile/profile.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CommentModule } from '@src/comment/comment.module';
     AuthModule,
     UserModule,
     CommentModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
