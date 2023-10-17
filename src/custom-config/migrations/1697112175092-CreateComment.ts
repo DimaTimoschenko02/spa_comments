@@ -14,6 +14,7 @@ export class CreateComment1697112175092 implements MigrationInterface {
     { name: 'user_id', type: 'int8' },
     { name: 'home_page', type: 'varchar', length: '256', isNullable: true },
     { name: 'is_main', type: 'boolean', default: true },
+    { name: 'parent_comment_id', type: 'int8', isNullable: true },
     {
       name: 'created_at',
       type: 'timestamp',
@@ -32,6 +33,13 @@ export class CreateComment1697112175092 implements MigrationInterface {
       referencedTableName: 'spa_user',
       referencedColumnNames: ['id'],
       onDelete: 'SET NULL',
+    },
+    {
+      name: 'spa_comment_spa_parent_comment_fk',
+      columnNames: ['parent_comment_id'],
+      referencedTableName: 'spa_comment',
+      referencedColumnNames: ['id'],
+      onDelete: 'CASCADE',
     },
   ];
   private readonly table = new Table({

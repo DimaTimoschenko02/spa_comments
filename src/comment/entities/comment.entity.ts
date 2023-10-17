@@ -25,7 +25,9 @@ export class Comment extends IdTimestampEntity {
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;
 
-  @ManyToMany(() => Comment, (comment) => comment.childComments)
+  @ManyToMany(() => Comment, (comment) => comment.childComments, {
+    onDelete: 'CASCADE',
+  })
   @JoinTable({
     name: 'comment_comment',
     joinColumn: { name: 'parent_comment_id', referencedColumnName: 'id' },
@@ -43,6 +45,10 @@ export class Comment extends IdTimestampEntity {
     inverseJoinColumn: { name: 'public_file_id', referencedColumnName: 'id' },
   })
   files: PublicFile[];
+
+  @ManyToOne(() => Comment, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'parent_comment_id', referencedColumnName: 'id' })
+  parentComment: Comment;
 
   childCommentsCount: number;
 }

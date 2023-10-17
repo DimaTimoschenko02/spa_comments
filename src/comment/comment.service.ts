@@ -7,12 +7,14 @@ import { CommentRepository } from '@src/comment/repositories/comment.repository'
 import { PublicFileService } from '@src/public-file/public-file.service';
 import { PublicFile } from '@src/public-file/entities/public-file.entity';
 import { CreateCommentBodyDto } from '@src/comment/dtos/create-comment-body.dto';
-import { isEmpty, isNil } from 'lodash';
+import { isEmpty, isNil, omit } from 'lodash';
 import { Comment } from '@src/comment/entities/comment.entity';
 import { FindOptionsRelations } from 'typeorm/find-options/FindOptionsRelations';
 import { UpdateCommentDto } from '@src/comment/dtos/update-comment.dto';
 import { PublicFileDto } from '@src/public-file/dtos/public-file.dto';
 import { GetCommentsQueryDto } from '@src/comment/dtos/get-comments-query.dto';
+import { GetCommentsResponseDto } from '@src/comment/dtos/get-comments-response.dto';
+import { LimitOffsetDto } from '@src/common/dtos/limit-offset.dto';
 
 @Injectable()
 export class CommentService {
@@ -40,6 +42,7 @@ export class CommentService {
       text: comment.text,
       files,
       user: { id: userId },
+      parentComment,
     });
 
     if (parentComment) {
@@ -67,6 +70,15 @@ export class CommentService {
     return comment;
   }
 
+  public async deleteComment(commentId: number, userId: number): Promise<void> {
+    const comment = await this.isExistsComment(commentId, { user: true });
+
+    if (comment.user.id !== userId)
+      throw new ForbiddenException('CanNotDeleteNotYouOwnComments');
+
+    await this.commentRepository.delete(commentId);
+  }
+
   public async updateComment(
     userId: number,
     commentId: number,
@@ -87,10 +99,24 @@ export class CommentService {
     await this.commentRepository.save(toUpdate);
   }
 
-  public async getComments(query: GetCommentsQueryDto) {
-    const comments = await this.commentRepository.getComments(query);
+  public async getCommentReplies(
+    commentId: number,
+    query: LimitOffsetDto,
+  ): Promise<GetCommentsResponseDto> {
+    const [comments, count] = await this.commentRepository.getCommentReplies(
+      commentId,
+      query,
+    );
 
-    console.dir(comments, { depth: null });
+    return { comments: await this.mapComments(comments), count };
+  }
+
+  public async getComments(
+    query: GetCommentsQueryDto,
+  ): Promise<GetCommentsResponseDto> {
+    const [comments, count] = await this.commentRepository.getComments(query);
+
+    return { comments: await this.mapComments(comments), count };
   }
 
   private async getFilesFromComment(comment: {
@@ -103,5 +129,26 @@ export class CommentService {
             this.publicFileService.getFileById(file.id),
           ),
         );
+  }
+
+  private async mapComments(comments: Comment[]) {
+    return Promise.all(
+      comments.map(async (comment) => ({
+        ...comment,
+        files: await Promise.all(
+          comment.files.map(async (file) => ({
+            ...file,
+            key: await this.publicFileService.getFileLink(file.key),
+          })),
+        ),
+        user: {
+          ...omit(comment.user, ['profile']),
+          ...comment.user.profile,
+          avatar: await this.publicFileService.getFileLink(
+            comment.user.profile.avatar.key,
+          ),
+        },
+      })),
+    );
   }
 }
