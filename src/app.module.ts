@@ -14,6 +14,7 @@ import { AppGateway } from '@src/app.gateway';
 import { SocketModule } from '@src/socket/socket.module';
 import { TokenJwtModule } from '@src/token-jwt/token-jwt.module';
 import { AwsS3Module } from '@src/aws-s3/aws-s3.module';
+import { CacheModule } from '@src/cache/cache.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AwsS3Module } from '@src/aws-s3/aws-s3.module';
     SocketModule,
     SocketSessionModule,
     TokenJwtModule,
+    CacheModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppGateway],

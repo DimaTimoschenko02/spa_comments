@@ -2,7 +2,7 @@ version: '3.8'
 
 volumes:
   pgdata:
-  #  cache-data:
+  cache-data:
   ioredis-data:
 
 services:
@@ -31,19 +31,19 @@ services:
     expose:
       - '${SOCKET_REDIS_PORT}'
     command: '--port ${SOCKET_REDIS_PORT}'
-  #  redis:
-  #    image: redis:6
-  #    container_name: redis
-  #    restart: on-failure
-  #    env_file:
-  #      - '.env'
-  #    volumes:
-  #      - cache-data:/data
-  #    ports:
-  #      - '${REDIS_CACHE_PORT}:${REDIS_CACHE_PORT}'
-  #    expose:
-  #      - '${REDIS_CACHE_PORT}'
-  #    command: '--port ${REDIS_CACHE_PORT}'
+  redis:
+    image: redis:6
+    container_name: redis
+    restart: on-failure
+    env_file:
+      - '.env'
+    volumes:
+      - cache-data:/data
+    ports:
+      - '${REDIS_CACHE_PORT}:${REDIS_CACHE_PORT}'
+    expose:
+      - '${REDIS_CACHE_PORT}'
+    command: '--port ${REDIS_CACHE_PORT}'
   app:
     container_name: app
     restart: on-failure
