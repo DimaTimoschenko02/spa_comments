@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta content='width=device-width, initial-scale=1.0' name='viewport'>
+  <title>WebSocket Notifications</title>
+  <style>
+      .avatar {
+          width: 50px;
+          height: 50px;
+          margin-right: 10px;
+      }
+  </style>
+</head>
+<body>
+<h1>WebSocket Notifications</h1>
+<ul id='notifications'></ul>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js'></script>
+<script>
+  const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3NTUyMjk0LCJleHAiOjE2OTc1NTMxNTh9.LkcV6DxzIEomIGUlMFw1LAWOtjerYNmZZUSRVFtPGNs';
+  const socket = io('http://localhost:3000', { query: { token: authToken } });
+
+  function displayNotification(notification) {
+    const notificationsList = document.getElementById('notifications');
+    const listItem = document.createElement('li');
+    const avatarImg = document.createElement('img');
+
+    avatarImg.width = 50;
+    avatarImg.height = 50;
+
+    avatarImg.src = notification.user.avatar;
+    avatarImg.alt = `${notification.user.name}'s Avatar`;
+
+    const notificationText = document.createElement('span');
+    notificationText.textContent = `${notification.user.name}: ${notification.message.text}`;
+
+    listItem.appendChild(avatarImg);
+    listItem.appendChild(notificationText);
+    notificationsList.appendChild(listItem);
+  }
+
+  const notificationsList = document.getElementById('notifications');
+
+  socket.on('comment_reply', (data) => {
+    displayNotification(data);
+  });
+</script>
+</body>
+</html>

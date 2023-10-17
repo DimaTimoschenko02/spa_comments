@@ -15,12 +15,15 @@ import { PublicFileDto } from '@src/public-file/dtos/public-file.dto';
 import { GetCommentsQueryDto } from '@src/comment/dtos/get-comments-query.dto';
 import { GetCommentsResponseDto } from '@src/comment/dtos/get-comments-response.dto';
 import { LimitOffsetDto } from '@src/common/dtos/limit-offset.dto';
+import { SocketService } from '@src/socket/socket.service';
+import { EventNamesEnum } from '@src/socket/enums/event-names.enum';
 
 @Injectable()
 export class CommentService {
   constructor(
     private readonly commentRepository: CommentRepository,
     private readonly publicFileService: PublicFileService,
+    private readonly socketService: SocketService,
   ) {}
 
   public async createFile(file: Express.Multer.File): Promise<PublicFile> {
@@ -29,12 +32,30 @@ export class CommentService {
 
   public async createComment(
     userId: number,
-    { comment, parentCommentId }: CreateCommentBodyDto,
+    { comment }: CreateCommentBodyDto,
   ) {
-    const parentComment = parentCommentId
-      ? await this.isExistsComment(parentCommentId, { childComments: true })
-      : null;
+    const files = await this.getFilesFromComment(comment);
 
+    await this.commentRepository.save({
+      homePage: comment.homePage,
+      text: comment.text,
+      files,
+      user: { id: userId },
+    });
+
+    //TODO move all into migration
+  }
+
+  public async createReplyComment(
+    userId: number,
+    parentCommentId: number,
+    { comment }: CreateCommentBodyDto,
+  ) {
+    const parentComment = await this.isExistsComment(parentCommentId, {
+      childComments: true,
+      user: { profile: { avatar: true } },
+    });
+    const user = parentComment.user;
     const files = await this.getFilesFromComment(comment);
 
     const newComment = await this.commentRepository.save({
@@ -45,13 +66,27 @@ export class CommentService {
       parentComment,
     });
 
-    if (parentComment) {
-      parentComment.childComments = [
-        ...parentComment.childComments,
-        newComment,
-      ];
-      await this.commentRepository.save(parentComment);
-    }
+    parentComment.childComments = [...parentComment.childComments, newComment];
+
+    await this.commentRepository.save(parentComment);
+
+    const userAvatarLink = await this.publicFileService.getFileLink(
+      user.profile.avatar.key,
+    );
+
+    await this.socketService.sendNotification(
+      EventNamesEnum.COMMENT_REPLY,
+      userId,
+      {
+        user: {
+          name: user.profile.name,
+          avatar: userAvatarLink,
+        },
+        message: {
+          text: newComment.text,
+        },
+      },
+    );
 
     //TODO move all into migration
   }

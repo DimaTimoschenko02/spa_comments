@@ -9,6 +9,11 @@ import { AuthModule } from '@src/auth/auth.module';
 import { UserModule } from '@src/user/user.module';
 import { CommentModule } from '@src/comment/comment.module';
 import { ProfileModule } from '@src/profile/profile.module';
+import { SocketSessionModule } from '@src/socket-session/socket-session.module';
+import { AppGateway } from '@src/app.gateway';
+import { SocketModule } from '@src/socket/socket.module';
+import { TokenJwtModule } from '@src/token-jwt/token-jwt.module';
+import { AwsS3Module } from '@src/aws-s3/aws-s3.module';
 
 @Module({
   imports: [
@@ -24,8 +29,12 @@ import { ProfileModule } from '@src/profile/profile.module';
     UserModule,
     CommentModule,
     ProfileModule,
+    AwsS3Module,
+    SocketModule,
+    SocketSessionModule,
+    TokenJwtModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppGateway],
 })
 export class AppModule {}

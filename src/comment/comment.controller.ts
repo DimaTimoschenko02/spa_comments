@@ -72,6 +72,19 @@ export class CommentController {
     return this.commentService.createComment(userId, createCommentDto);
   }
 
+  @Post('reply/:id')
+  public async createReplyComment(
+    @Body() createCommentDto: CreateCommentBodyDto,
+    @Param() { id: parentCommentId }: IdDto,
+    @GetCurrentUserId() userId: number,
+  ): Promise<void> {
+    return this.commentService.createReplyComment(
+      userId,
+      parentCommentId,
+      createCommentDto,
+    );
+  }
+
   @Put(':id')
   public async updateComment(
     @Body() comment: UpdateCommentDto,
