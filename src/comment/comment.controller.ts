@@ -8,6 +8,7 @@ import {
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -28,6 +29,8 @@ import { CreateCommentBodyDto } from '@src/comment/dtos/create-comment-body.dto'
 import { UpdateCommentDto } from '@src/comment/dtos/update-comment.dto';
 import { IdDto } from '@src/common/dtos/id.dto';
 import { GetCommentsQueryDto } from '@src/comment/dtos/get-comments-query.dto';
+import { GetCommentsResponseDto } from '@src/comment/dtos/get-comments-response.dto';
+import { LimitOffsetDto } from '@src/common/dtos/limit-offset.dto';
 
 @ApiTags('Comment')
 @ApiBearerAuth()
@@ -79,7 +82,25 @@ export class CommentController {
   }
 
   @Get()
-  public async getComments(@Query() query: GetCommentsQueryDto) {
+  public async getComments(
+    @Query() query: GetCommentsQueryDto,
+  ): Promise<GetCommentsResponseDto> {
     return this.commentService.getComments(query);
+  }
+
+  @Get('replies/:id')
+  public async getCommentReplies(
+    @Param() { id: commentId }: IdDto,
+    @Query() query: LimitOffsetDto,
+  ): Promise<GetCommentsResponseDto> {
+    return this.commentService.getCommentReplies(commentId, query);
+  }
+
+  @Delete(':id')
+  public async deleteComment(
+    @Param() { id: commentId }: IdDto,
+    @GetCurrentUserId() userId: number,
+  ) {
+    return this.commentService.deleteComment(commentId, userId);
   }
 }
