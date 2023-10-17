@@ -37,20 +37,19 @@ export class AppGateway
   public async handleConnection(client: Socket) {
     console.log('connected');
     const token = client.handshake.query.token as string;
-    const userId = await this.getUserId(token);
-    console.log({ auth: client.handshake.query.token, userId });
+    const userId = this.getUserId(token);
+
     await this.socketSessionService.setUserSocket(userId, client.id);
   }
 
   public async handleDisconnect(client: Socket) {
     const token = client.handshake.query.token as string;
-    const userId = await this.getUserId(token);
+    const userId = this.getUserId(token);
 
     await this.socketSessionService.removeUserSocket(userId, client.id);
   }
 
-  private async getUserId(token: string) {
-    console.log({ decoded: this.tokenService.decodeToken(token) });
-    return this.tokenService.decodeToken(token).sub;
+  private getUserId(token: string): number {
+    return +this.tokenService.decodeToken(token).sub;
   }
 }

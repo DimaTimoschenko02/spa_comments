@@ -5,28 +5,33 @@ import { Cache } from 'cache-manager';
 @Injectable()
 export class SocketSessionService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
-  public async getUserSocket(employeeUuid: string) {
-    return await this.cacheManager.get<string[] | undefined>(employeeUuid);
+
+  public async getUserSocket(userId: number): Promise<string[]> {
+    return await this.cacheManager.get<string[] | undefined>(userId.toString());
   }
 
-  public async setUserSocket(employeeUuid: string, socketId: string) {
-    const existingUuidSockets = await this.getUserSocket(employeeUuid);
-    if (existingUuidSockets) {
-      return await this.cacheManager.set(employeeUuid, [
-        ...existingUuidSockets,
+  public async setUserSocket(userId: number, socketId: string) {
+    const existingSocket = await this.getUserSocket(userId);
+
+    if (existingSocket) {
+      return await this.cacheManager.set(userId.toString(), [
+        ...existingSocket,
         socketId,
       ]);
     }
-    return await this.cacheManager.set(employeeUuid, [socketId]);
+
+    return await this.cacheManager.set(userId.toString(), [socketId]);
   }
 
-  public async removeUserSocket(employeeUuid: string, socketId: string) {
-    const existingUuidSockets = await this.getUserSocket(employeeUuid);
-    if (existingUuidSockets) {
-      const filteredSockets = existingUuidSockets.filter(
+  public async removeUserSocket(userId: number, socketId: string) {
+    const existingSocket = await this.getUserSocket(userId);
+
+    if (existingSocket) {
+      const filteredSockets = existingSocket.filter(
         (socket) => socket !== socketId,
       );
-      await this.cacheManager.set(employeeUuid, filteredSockets);
+
+      await this.cacheManager.set(userId.toString(), filteredSockets);
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtPayload, sign, verify } from 'jsonwebtoken';
 
 import { CustomConfigService } from '@src/custom-config/custom-config.service';
@@ -57,7 +57,7 @@ export class TokenJwtService {
     try {
       return verify(token, this.jwtSecret) as JwtPayload;
     } catch (error) {
-      return error;
+      throw new UnauthorizedException(error.message);
     }
   }
 }
