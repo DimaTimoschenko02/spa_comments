@@ -109,6 +109,11 @@ export class CommentController {
     return this.commentService.getCommentReplies(commentId, query);
   }
 
+  @Get(':id')
+  public async getCommentById(@Param() { id: commentId }: IdDto) {
+    return this.commentService.getCommentById(commentId);
+  }
+
   @Delete(':id')
   public async deleteComment(
     @Param() { id: commentId }: IdDto,

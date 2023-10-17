@@ -17,6 +17,8 @@ import { GetCommentsResponseDto } from '@src/comment/dtos/get-comments-response.
 import { LimitOffsetDto } from '@src/common/dtos/limit-offset.dto';
 import { SocketService } from '@src/socket/socket.service';
 import { EventNamesEnum } from '@src/socket/enums/event-names.enum';
+import { MappedCommentDto } from '@src/comment/dtos/mapped-comment.dto';
+import { GetCommentByIdDto } from '@src/comment/dtos/get-comment-by-id.dto';
 
 @Injectable()
 export class CommentService {
@@ -30,10 +32,29 @@ export class CommentService {
     return this.publicFileService.uploadFile(file);
   }
 
+  public async getCommentById(id: number): Promise<GetCommentByIdDto> {
+    const { parentComment } = await this.isExistsComment(id, {
+      parentComment: { files: true },
+    });
+
+    const comment = await this.commentRepository.getCommentById(id);
+    console.log({ comment });
+    return {
+      parentComment: parentComment
+        ? {
+            text: parentComment.text,
+            id: parentComment.id,
+            filesCount: parentComment.files.length,
+          }
+        : null,
+      comment: (await this.mapComments([comment]))[0],
+    };
+  }
+
   public async createComment(
     userId: number,
     { comment }: CreateCommentBodyDto,
-  ) {
+  ): Promise<void> {
     const files = await this.getFilesFromComment(comment);
 
     await this.commentRepository.save({
@@ -50,7 +71,7 @@ export class CommentService {
     userId: number,
     parentCommentId: number,
     { comment }: CreateCommentBodyDto,
-  ) {
+  ): Promise<void> {
     const parentComment = await this.isExistsComment(parentCommentId, {
       childComments: true,
       user: { profile: { avatar: true } },
@@ -166,7 +187,7 @@ export class CommentService {
         );
   }
 
-  private async mapComments(comments: Comment[]) {
+  private async mapComments(comments: Comment[]): Promise<MappedCommentDto[]> {
     return Promise.all(
       comments.map(async (comment) => ({
         ...comment,

@@ -27,6 +27,12 @@ export class CommentRepository extends Repository<Comment> {
       .getManyAndCount();
   }
 
+  public async getCommentById(commentId: number): Promise<Comment> {
+    const query = this.getCommentsQuery();
+
+    return query.where('comment.id = :commentId', { commentId }).getOne();
+  }
+
   public async getComments({
     limit,
     orderBy,
