@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta content='width=device-width, initial-scale=1.0' name='viewport'>
+  <title>WebSocket Notifications</title>
+</head>
+<body>
+<h1>WebSocket Notifications</h1>
+<ul id='notifications'></ul>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js'></script>
+<script>
+  const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3NTQyMDk5LCJleHAiOjE2OTc1NDI5NjN9.M4bZWU_XIbBtN1QJ4Yo_JnjF92JVNq9Pn8CLNRuj7Wc';
+  const socket = io('http://localhost:3000', { query: { token: authToken } });
+
+  const notificationsList = document.getElementById('notifications');
+
+  socket.on('newReply', (data) => {
+    const listItem = document.createElement('li');
+    listItem.textContent = `New reply: ${data.replyText}`;
+    notificationsList.appendChild(listItem);
+  });
+</script>
+</body>
+</html>
