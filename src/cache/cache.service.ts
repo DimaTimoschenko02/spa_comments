@@ -24,8 +24,24 @@ export class CacheService {
     return this.getDataByKey<UserProfileResponseDto>(key);
   }
 
+  public async setUserCaptcha(userId: number, text: string) {
+    const key = this.getCaptchaKey(userId);
+
+    await this.saveData<string>(key, text, CacheTtlEnum.TEN_MINUTES);
+  }
+
+  public async getUserCaptcha(userId: number): Promise<string> {
+    const key = this.getUserProfileKey(userId);
+
+    return this.getDataByKey<string>(key);
+  }
+
   private getUserProfileKey(userId: number) {
     return `user-profile-${userId}`;
+  }
+
+  private getCaptchaKey(userId: number) {
+    return `user-captcha-${userId}`;
   }
 
   private async saveData<Value>(

@@ -19,17 +19,38 @@ import { SocketService } from '@src/socket/socket.service';
 import { EventNamesEnum } from '@src/socket/enums/event-names.enum';
 import { MappedCommentDto } from '@src/comment/dtos/mapped-comment.dto';
 import { GetCommentByIdDto } from '@src/comment/dtos/get-comment-by-id.dto';
+import { CacheService } from '@src/cache/cache.service';
+import { create } from 'svg-captcha';
+import { GetCaptchaDto } from '@src/comment/dtos/get-captcha.dto';
 
 @Injectable()
 export class CommentService {
+  private readonly captchaSize: number;
+  private readonly captchaNoise: number;
+
   constructor(
     private readonly commentRepository: CommentRepository,
     private readonly publicFileService: PublicFileService,
     private readonly socketService: SocketService,
-  ) {}
+    private readonly cacheService: CacheService,
+  ) {
+    this.captchaSize = 6;
+    this.captchaNoise = 1;
+  }
 
   public async createFile(file: Express.Multer.File): Promise<PublicFile> {
     return this.publicFileService.uploadFile(file);
+  }
+
+  public async createCaptcha(userId: number): Promise<GetCaptchaDto> {
+    const captcha = create({
+      size: this.captchaSize,
+      noise: this.captchaNoise,
+    });
+
+    await this.cacheService.setUserCaptcha(userId, captcha.text);
+
+    return { captcha: captcha.data };
   }
 
   public async getCommentById(id: number): Promise<GetCommentByIdDto> {
@@ -53,8 +74,10 @@ export class CommentService {
 
   public async createComment(
     userId: number,
-    { comment }: CreateCommentBodyDto,
+    { comment, captchaText }: CreateCommentBodyDto,
   ): Promise<void> {
+    await this.validateUserCaptcha(userId, captchaText);
+
     const files = await this.getFilesFromComment(comment);
 
     await this.commentRepository.save({
@@ -173,6 +196,13 @@ export class CommentService {
     const [comments, count] = await this.commentRepository.getComments(query);
 
     return { comments: await this.mapComments(comments), count };
+  }
+
+  private async validateUserCaptcha(userId: number, captchaText: string) {
+    const validText = await this.cacheService.getUserCaptcha(userId);
+
+    if (captchaText !== validText)
+      throw new ForbiddenException('IncorrectCaptcha');
   }
 
   private async getFilesFromComment(comment: {

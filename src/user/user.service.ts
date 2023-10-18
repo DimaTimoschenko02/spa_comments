@@ -78,7 +78,7 @@ export class UserService {
     const user = await this.isExistsUser(id, { profile: { avatar: true } });
 
     const userProfile = await this.cacheService.getUserProfile(id);
-
+    console.log({ userProfile });
     if (userProfile) return userProfile;
 
     const mappedUser = {

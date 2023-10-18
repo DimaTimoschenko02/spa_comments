@@ -32,6 +32,7 @@ import { GetCommentsResponseDto } from '@src/comment/dtos/get-comments-response.
 import { LimitOffsetDto } from '@src/common/dtos/limit-offset.dto';
 import { ParseFile } from '@src/common/pipes/parse-file.pipe';
 import { commentFileFilter } from '@src/common/utils/comment-file-filter.util';
+import { GetCaptchaDto } from '@src/comment/dtos/get-captcha.dto';
 
 @ApiTags('Comment')
 @ApiBearerAuth()
@@ -39,6 +40,13 @@ import { commentFileFilter } from '@src/common/utils/comment-file-filter.util';
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
+
+  @Get('captcha')
+  public async getCaptcha(
+    @GetCurrentUserId() userId: number,
+  ): Promise<GetCaptchaDto> {
+    return this.commentService.createCaptcha(userId);
+  }
 
   @Post('file')
   @ApiOkResponse({ type: PublicFileDto })
