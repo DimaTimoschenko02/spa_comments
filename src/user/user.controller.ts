@@ -1,7 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from '@src/user/user.service';
 import { CreateUserBodyDto } from '@src/user/dtos/create-user-body.dto';
+import { IdDto } from '@src/common/dtos/id.dto';
+import { UserProfileResponseDto } from '@src/user/dtos/user-profile-response.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -13,5 +15,12 @@ export class UserController {
     @Body() { user }: CreateUserBodyDto,
   ): Promise<{ message: string }> {
     return this.userService.createUser(user);
+  }
+
+  @Get('profile/:id')
+  public async getUserProfile(
+    @Param() { id }: IdDto,
+  ): Promise<UserProfileResponseDto> {
+    return this.userService.getUserProfile(id);
   }
 }

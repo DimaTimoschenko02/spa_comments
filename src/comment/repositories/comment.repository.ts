@@ -56,6 +56,7 @@ export class CommentRepository extends Repository<Comment> {
         'comment.text',
         'comment.homePage',
         'comment.createdAt',
+        'user.id',
         'user.email',
         'profile.name',
         'file.key',
