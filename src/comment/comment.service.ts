@@ -38,7 +38,7 @@ export class CommentService {
     });
 
     const comment = await this.commentRepository.getCommentById(id);
-    console.log({ comment });
+
     return {
       parentComment: parentComment
         ? {

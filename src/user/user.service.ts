@@ -1,10 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserRepository } from '@src/user/repositories/user.repository';
 import { User } from '@src/user/entities/user.entity';
 import { CreateUserDto } from '@src/user/dtos/create-user.dto';
 import { genSaltSync, hashSync } from 'bcrypt';
 import { CustomConfigService } from '@src/custom-config/custom-config.service';
 import { ProfileService } from '@src/profile/profile.service';
+import { FindOptionsRelations } from 'typeorm/find-options/FindOptionsRelations';
+import { isNil } from '@nestjs/common/utils/shared.utils';
+import { PublicFileService } from '@src/public-file/public-file.service';
+import { UserProfileResponseDto } from '@src/user/dtos/user-profile-response.dto';
+import { CacheService } from '@src/cache/cache.service';
 
 @Injectable()
 export class UserService {
@@ -14,6 +23,8 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly customConfigService: CustomConfigService,
     private readonly profileService: ProfileService,
+    private readonly publicFileService: PublicFileService,
+    private readonly cacheService: CacheService,
   ) {
     this.saltRounds = this.customConfigService.get<number>('SALT_ROUNDS');
   }
@@ -52,18 +63,57 @@ export class UserService {
       name: userName,
     });
 
-    await this.userRepository.save({
+    const newUser = await this.userRepository.save({
       ...user,
       password: hashedPassword,
       profile: userProfile,
     });
 
+    this.getUserProfile(newUser.id).then();
+
     return { message: 'UserSuccessfullySignedUp' };
+  }
+
+  public async getUserProfile(id: number): Promise<UserProfileResponseDto> {
+    const user = await this.isExistsUser(id, { profile: { avatar: true } });
+
+    const userProfile = await this.cacheService.getUserProfile(id);
+
+    if (userProfile) return userProfile;
+
+    const mappedUser = {
+      id: user.id,
+      name: user.profile.name,
+      email: user.email,
+      avatar: user.profile.avatar
+        ? await this.publicFileService.getFileLink(user.profile.avatar.key)
+        : null,
+    };
+
+    this.cacheService.setUserProfile({ user: mappedUser }).then();
+
+    return {
+      user: mappedUser,
+    };
+  }
+
+  public async isExistsUser(
+    userId: number,
+    relations?: FindOptionsRelations<User>,
+  ): Promise<User | null> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations,
+    });
+
+    if (isNil(user)) throw new NotFoundException('UserNotFound');
+
+    return user;
   }
 
   public hashPassword(password: string): string {
     const salt = genSaltSync(+this.saltRounds);
-    console.log({ password, salt });
+
     return hashSync(password, salt);
   }
 }

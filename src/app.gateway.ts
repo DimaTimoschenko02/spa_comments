@@ -35,7 +35,6 @@ export class AppGateway
   }
 
   public async handleConnection(client: Socket) {
-    console.log('connected');
     const token = client.handshake.query.token as string;
     const userId = this.getUserId(token);
 
