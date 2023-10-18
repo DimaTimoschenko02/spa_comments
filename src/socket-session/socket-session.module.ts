@@ -18,7 +18,6 @@ import { RedisTtl } from '@src/common/enums/redis-ttl.enum';
       imports: [CustomConfigModule],
       inject: [ConnectionConfigService],
       useFactory: async (dbConfigService: ConnectionConfigService) => {
-        console.log('before connect');
         return {
           store: await redisStore({
             //'redis://172.17.208.1:6380'

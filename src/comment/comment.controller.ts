@@ -21,7 +21,6 @@ import {
 import { CommentService } from '@src/comment/comment.service';
 import { JwtAuthGuard } from '@src/auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { fileFilter } from '@src/common/utils/fileFilter';
 import { PublicFile } from '@src/public-file/entities/public-file.entity';
 import { PublicFileDto } from '@src/public-file/dtos/public-file.dto';
 import { GetCurrentUserId } from '@src/common/decorators/get-current-user-id.decorator';
@@ -31,6 +30,8 @@ import { IdDto } from '@src/common/dtos/id.dto';
 import { GetCommentsQueryDto } from '@src/comment/dtos/get-comments-query.dto';
 import { GetCommentsResponseDto } from '@src/comment/dtos/get-comments-response.dto';
 import { LimitOffsetDto } from '@src/common/dtos/limit-offset.dto';
+import { ParseFile } from '@src/common/pipes/parse-file.pipe';
+import { commentFileFilter } from '@src/common/utils/comment-file-filter.util';
 
 @ApiTags('Comment')
 @ApiBearerAuth()
@@ -53,13 +54,9 @@ export class CommentController {
       },
     },
   })
-  @UseInterceptors(
-    FileInterceptor('file', {
-      fileFilter,
-    }),
-  )
+  @UseInterceptors(FileInterceptor('file', { fileFilter: commentFileFilter }))
   public async createFile(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(ParseFile) file: Express.Multer.File,
   ): Promise<PublicFile> {
     return this.commentService.createFile(file);
   }
