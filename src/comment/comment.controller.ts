@@ -2,6 +2,8 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -32,6 +34,9 @@ import { GetCommentsResponseDto } from '@src/comment/dtos/get-comments-response.
 import { LimitOffsetDto } from '@src/common/dtos/limit-offset.dto';
 import { ParseFile } from '@src/common/pipes/parse-file.pipe';
 import { commentFileFilter } from '@src/common/utils/comment-file-filter.util';
+import { GetCommentByIdDto } from '@src/comment/dtos/get-comment-by-id.dto';
+import { NotFoundError } from 'rxjs';
+import { NotFoundDto } from '@src/common/dtos/not-found-dto';
 
 @ApiTags('Comment')
 @ApiBearerAuth()
@@ -62,6 +67,7 @@ export class CommentController {
   }
 
   @Post()
+  @ApiNoContentResponse()
   public async createComment(
     @Body() createCommentDto: CreateCommentBodyDto,
     @GetCurrentUserId() userId: number,
@@ -70,6 +76,8 @@ export class CommentController {
   }
 
   @Post('reply/:id')
+  @ApiNoContentResponse()
+  @ApiNotFoundResponse({ type: NotFoundDto, description: 'CommentNotFound' })
   public async createReplyComment(
     @Body() createCommentDto: CreateCommentBodyDto,
     @Param() { id: parentCommentId }: IdDto,
@@ -83,6 +91,8 @@ export class CommentController {
   }
 
   @Put(':id')
+  @ApiNoContentResponse()
+  @ApiNotFoundResponse({ type: NotFoundError, description: 'CommentNotFound' })
   public async updateComment(
     @Body() comment: UpdateCommentDto,
     @GetCurrentUserId() userId: number,
@@ -92,6 +102,7 @@ export class CommentController {
   }
 
   @Get()
+  @ApiOkResponse({ type: GetCommentsResponseDto })
   public async getComments(
     @Query() query: GetCommentsQueryDto,
   ): Promise<GetCommentsResponseDto> {
@@ -99,6 +110,8 @@ export class CommentController {
   }
 
   @Get('replies/:id')
+  @ApiOkResponse({ type: GetCommentsResponseDto })
+  @ApiNotFoundResponse({ type: NotFoundError, description: 'CommentNotFound' })
   public async getCommentReplies(
     @Param() { id: commentId }: IdDto,
     @Query() query: LimitOffsetDto,
@@ -107,15 +120,21 @@ export class CommentController {
   }
 
   @Get(':id')
-  public async getCommentById(@Param() { id: commentId }: IdDto) {
+  @ApiOkResponse({ type: GetCommentByIdDto })
+  @ApiNotFoundResponse({ type: NotFoundError, description: 'CommentNotFound' })
+  public async getCommentById(
+    @Param() { id: commentId }: IdDto,
+  ): Promise<GetCommentByIdDto> {
     return this.commentService.getCommentById(commentId);
   }
 
   @Delete(':id')
+  @ApiNoContentResponse()
+  @ApiNotFoundResponse({ type: NotFoundError, description: 'CommentNotFound' })
   public async deleteComment(
     @Param() { id: commentId }: IdDto,
     @GetCurrentUserId() userId: number,
-  ) {
+  ): Promise<void> {
     return this.commentService.deleteComment(commentId, userId);
   }
 }

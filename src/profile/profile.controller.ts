@@ -11,6 +11,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -53,6 +54,7 @@ export class ProfileController {
   }
 
   @Patch('avatar')
+  @ApiNoContentResponse()
   public async setAvatar(
     @Body() { avatar }: SetAvatarDto,
     @GetCurrentUserId() userId: number,

@@ -2,6 +2,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
@@ -26,7 +27,7 @@ export class AuthController {
   @ApiCreatedResponse({ type: AccessRefreshTokensDto })
   @ApiOkResponse({ type: AccessRefreshTokensDto })
   @ApiBadRequestResponse({ type: OAuthBadRequestDto })
-  public async adminSignIn(
+  public async localSignIn(
     @Body() { user }: SignInBodyDto,
   ): Promise<AccessRefreshTokensDto> {
     return await this.authService.signIn(user);
@@ -45,6 +46,7 @@ export class AuthController {
   }
 
   @Patch('log-out')
+  @ApiNoContentResponse()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   public async logOut(@GetCurrentUserId() userId: number): Promise<void> {

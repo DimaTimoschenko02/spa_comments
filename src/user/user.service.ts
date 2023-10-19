@@ -48,10 +48,7 @@ export class UserService {
     return await this.userRepository.findOne({ where: { id } });
   }
 
-  public async createUser({
-    userName,
-    ...user
-  }: CreateUserDto): Promise<{ message: string }> {
+  public async createUser({ userName, ...user }: CreateUserDto): Promise<void> {
     const isExistsUser = await this.getUserByEmail(user.email);
 
     if (isExistsUser)
@@ -70,8 +67,6 @@ export class UserService {
     });
 
     this.getUserProfile(newUser.id).then();
-
-    return { message: 'UserSuccessfullySignedUp' };
   }
 
   public async getUserProfile(id: number): Promise<UserProfileResponseDto> {

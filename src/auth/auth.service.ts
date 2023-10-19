@@ -23,7 +23,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly customConfigService: CustomConfigService,
   ) {
-    this.saltRounds = this.customConfigService.get<number>('SALT_ROUNDS');
+    this.saltRounds = +this.customConfigService.get<number>('SALT_ROUNDS');
   }
 
   public async signIn({
@@ -63,16 +63,14 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  public async logOut(userId: number) {
+  public async logOut(userId: number): Promise<void> {
     await this.userService.deleteRefreshToken(userId);
   }
 
-  private async validateAndGetTokens(user: User, password: string) {
-    if (isNil(user.password))
-      throw new BadRequestException('NeedToCompletePassword');
-
-    if (isNil(password)) throw new BadRequestException('PasswordRequired');
-
+  private async validateAndGetTokens(
+    user: User,
+    password: string,
+  ): Promise<AccessRefreshTokensDto> {
     const checkingResponse = await this.compareHashToInputValue(
       user.password,
       password,
@@ -96,7 +94,7 @@ export class AuthService {
   }
 
   private async hashRefreshToken(token: string): Promise<string> {
-    const salt = genSaltSync(+this.saltRounds); //TODO fix to number
+    const salt = genSaltSync(this.saltRounds);
 
     return hashSync(token, salt);
   }

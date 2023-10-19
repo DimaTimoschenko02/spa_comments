@@ -14,7 +14,7 @@ export class SocketService {
     eventName: EventNamesEnum,
     userId: number,
     notification: ReplyNotificationType,
-  ) {
+  ): Promise<boolean> {
     const userSockets = await this.socketSessionService.getUserSocket(userId);
 
     return this.server.to(userSockets).emit(eventName, notification);

@@ -63,8 +63,6 @@ export class CommentService {
       files,
       user: { id: userId },
     });
-
-    //TODO move all into migration
   }
 
   public async createReplyComment(
@@ -79,17 +77,26 @@ export class CommentService {
     const user = parentComment.user;
     const files = await this.getFilesFromComment(comment);
 
-    const newComment = await this.commentRepository.save({
-      homePage: comment.homePage,
-      text: comment.text,
-      files,
-      user: { id: userId },
-      parentComment,
-    });
+    const newComment = await this.commentRepository.manager.transaction(
+      async (entityManager) => {
+        const newComment = await entityManager.save(Comment, {
+          homePage: comment.homePage,
+          text: comment.text,
+          files,
+          user: { id: userId },
+          parentComment,
+        });
 
-    parentComment.childComments = [...parentComment.childComments, newComment];
+        parentComment.childComments = [
+          ...parentComment.childComments,
+          newComment,
+        ];
 
-    await this.commentRepository.save(parentComment);
+        await entityManager.save(Comment, parentComment);
+
+        return newComment;
+      },
+    );
 
     const userAvatarLink = await this.publicFileService.getFileLink(
       user.profile.avatar.key,
@@ -108,8 +115,6 @@ export class CommentService {
         },
       },
     );
-
-    //TODO move all into migration
   }
 
   public async isExistsComment(
@@ -152,6 +157,7 @@ export class CommentService {
     isExistsComment.text = comment.text ?? null;
 
     const toUpdate = await this.commentRepository.preload(isExistsComment);
+
     await this.commentRepository.save(toUpdate);
   }
 
