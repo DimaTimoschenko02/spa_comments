@@ -11,7 +11,6 @@ export class CreatePublicFileComment1697363508764
 {
   private readonly tableName = 'spa_comment_public_file';
   private readonly columns: TableColumnOptions[] = [
-    // { name: 'id', type: 'int8', isPrimary: true, isGenerated: true },
     {
       name: 'public_file_id',
       type: 'int8',

@@ -15,7 +15,7 @@ import { TokenJwtService } from '@src/token-jwt/token-jwt.service';
   allowEIO3: true,
   transports: ['websocket', 'polling'],
   cors: {
-    origin: '*',
+    origin: '*', // i dont have frontend so didnt set origin
   },
 })
 export class AppGateway

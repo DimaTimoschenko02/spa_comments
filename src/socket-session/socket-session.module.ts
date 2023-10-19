@@ -20,7 +20,6 @@ import { RedisTtl } from '@src/common/enums/redis-ttl.enum';
       useFactory: async (dbConfigService: ConnectionConfigService) => {
         return {
           store: await redisStore({
-            //'redis://172.17.208.1:6380'
             url: dbConfigService.getRedisSocketConnectionUrl(),
             ttl: RedisTtl.ONE_WEEK,
           }),

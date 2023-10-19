@@ -8,7 +8,9 @@ import { UserProfileResponseDto } from '@src/user/dtos/user-profile-response.dto
 export class CacheService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
-  public async setUserProfile(userProfile: UserProfileResponseDto) {
+  public async setUserProfile(
+    userProfile: UserProfileResponseDto,
+  ): Promise<void> {
     const key = this.getUserProfileKey(userProfile.user.id);
 
     await this.saveData<UserProfileResponseDto>(
@@ -24,7 +26,7 @@ export class CacheService {
     return this.getDataByKey<UserProfileResponseDto>(key);
   }
 
-  private getUserProfileKey(userId: number) {
+  private getUserProfileKey(userId: number): string {
     return `user-profile-${userId}`;
   }
 

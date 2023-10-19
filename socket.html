@@ -4,13 +4,6 @@
   <meta charset='UTF-8'>
   <meta content='width=device-width, initial-scale=1.0' name='viewport'>
   <title>WebSocket Notifications</title>
-  <style>
-      .avatar {
-          width: 50px;
-          height: 50px;
-          margin-right: 10px;
-      }
-  </style>
 </head>
 <body>
 <h1>WebSocket Notifications</h1>
@@ -18,7 +11,7 @@
 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js'></script>
 <script>
-  const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3NTU2Njk0LCJleHAiOjE2OTc2NDMwOTR9.5FBYomSx--w6nJKGW9h_Yht8yMLH7l3Euv9RNwPwhLo';
+  const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3NzA4NDQ0LCJleHAiOjE2OTc3OTQ4NDR9.g0k79cb9oJRaC2bptNeTSOfc2fvOlzHDjLFTgC5ggnM';
   const socket = io('http://localhost:3000', { query: { token: authToken } });
 
   function displayNotification(notification) {

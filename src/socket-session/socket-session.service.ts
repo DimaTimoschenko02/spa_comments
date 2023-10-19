@@ -10,7 +10,7 @@ export class SocketSessionService {
     return await this.cacheManager.get<string[] | undefined>(userId.toString());
   }
 
-  public async setUserSocket(userId: number, socketId: string) {
+  public async setUserSocket(userId: number, socketId: string): Promise<void> {
     const existingSocket = await this.getUserSocket(userId);
 
     if (existingSocket) {
@@ -23,7 +23,10 @@ export class SocketSessionService {
     return await this.cacheManager.set(userId.toString(), [socketId]);
   }
 
-  public async removeUserSocket(userId: number, socketId: string) {
+  public async removeUserSocket(
+    userId: number,
+    socketId: string,
+  ): Promise<void> {
     const existingSocket = await this.getUserSocket(userId);
 
     if (existingSocket) {

@@ -30,10 +30,10 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  app.enableCors({ origin: '*' });
+  app.enableCors({ origin: '*' }); // i dont have frontend so didnt set origin
   app.use(helmet());
 
-  app.use(json({ limit: '50mb' }));
+  app.use(json());
   app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   await app.listen(appPort);
